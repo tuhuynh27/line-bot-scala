@@ -2,7 +2,7 @@
 
 ## Introduce
 
-Simple LINE Bot
+Simple LINE Bot, for LINE VN HR
 
 Written with [com.tuhuynh.httpserver](https://github.com/huynhminhtufu/httpserver)
 

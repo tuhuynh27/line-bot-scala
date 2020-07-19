@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.rmi.activation.UnknownObjectException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +21,9 @@ import com.tuhuynh.linebot.entities.ReplyObject;
 import com.tuhuynh.linebot.entities.UserProfile;
 import com.tuhuynh.linebot.entities.WebhookEventObject;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 
 public class WebhookHandler {
@@ -29,6 +32,7 @@ public class WebhookHandler {
     private final LinkedList<String> dictQueue = new LinkedList<>();
     private HashMap<String, String> teachDict;
     private Event event;
+    private boolean trashtalkMode = false;
 
     public WebhookHandler(final String token) throws IOException {
         this.token = token;
@@ -40,16 +44,16 @@ public class WebhookHandler {
         }
     }
 
-    public void getWebHookEventObject(final String body) throws UnknownObjectException {
+    public void getWebHookEventObject(final String body) throws Exception {
         val webhookEventObject = gson.fromJson(body, WebhookEventObject.class);
         if (webhookEventObject.getEvents() != null && webhookEventObject.getEvents()[0] != null) {
             event = webhookEventObject.getEvents()[0];
         } else {
-            throw new UnknownObjectException("Webhook Event Object not valid!");
+            throw new Exception("Webhook Event Object not valid!");
         }
     }
 
-    public UserProfile getProfile() throws IOException, UnknownObjectException {
+    public UserProfile getProfile() throws Exception {
         val headers = new HashMap<String, String>();
         headers.put("Authorization",
                     "Bearer " + token);
@@ -62,7 +66,7 @@ public class WebhookHandler {
             return gson.fromJson(response.getBody(), UserProfile.class);
         }
 
-        throw new UnknownObjectException("Cannot get user profile");
+        throw new Exception("Cannot get user profile");
     }
 
     public void reply(final String text) throws IOException {
@@ -85,7 +89,7 @@ public class WebhookHandler {
                   .build().perform();
     }
 
-    public void sync() throws FileNotFoundException {
+    public void sync() throws FileNotFoundException, UnsupportedEncodingException {
         val out = new PrintWriter("data.json");
         out.print(gson.toJson(teachDict));
         out.flush();
@@ -105,29 +109,78 @@ public class WebhookHandler {
         return gson.fromJson(str, type);
     }
 
-    public HttpResponse handleWebhook(final RequestContext ctx) throws UnknownObjectException, IOException {
+    @Builder
+    @Getter
+    @Setter
+    private static class SimsimiResponse {
+        private String success;
+    }
+
+    public String getTrashTalk(final String msg) throws IOException {
+        val result = HttpClient.builder()
+                               .method("GET").url("https://simsumi.herokuapp.com/api?text=" + msg.replace(" ", "+") + "&lang=vi")
+                               .build().perform();
+        val body = result.getBody();
+        val simsimiObj = gson.fromJson(body, SimsimiResponse.class);
+        return simsimiObj.getSuccess();
+    }
+
+    public HttpResponse handleWebhook(final RequestContext ctx) throws Exception {
         getWebHookEventObject(ctx.getBody());
 
         val textOrig = event.getMessage().getText().trim();
         val text = event.getMessage().getText().trim().toLowerCase();
+
+        if ("bot".equals(text)) {
+            reply("http://git.io/JJnc2");
+            return HttpResponse.of("OK");
+        }
+
+        if (trashtalkMode) {
+            if ("stop trash".equals(text)) {
+                trashtalkMode = false;
+                reply("Đã dừng trash talk ạ!");
+                return HttpResponse.of("OK");
+            }
+
+            val trashTalkText = getTrashTalk(text);
+            reply(trashTalkText);
+            return HttpResponse.of("OK");
+        }
+
+        if ("trash".equals(text)) {
+            trashtalkMode = true;
+            reply("Đã vào trash talk mode!");
+            return HttpResponse.of("OK");
+        }
 
         if (dictQueue.isEmpty() && ("dạy bot".equals(text) || "bot dạy".equals(text) || "dạy".equals(text))) {
             val profile = getProfile();
             final List<String> admins = Arrays.asList("Tu Huynh (Tyler)", "Nga Le (Jade)", "Ninh",
                                                       "Phuong Quach");
             if (profile != null && admins.stream().anyMatch(s -> s.equals(profile.getDisplayName()))) {
-                dictQueue.addLast("dict");
+                dictQueue.addLast(profile.getDisplayName());
                 reply("Bạn muốn dạy cho từ gì?");
             }
         } else if (dictQueue.size() == 1) {
-            dictQueue.addLast(text);
-            reply("Bạn muốn nó trả lời sao?");
+            val profile = getProfile();
+            if (profile != null && profile.getDisplayName().equals(dictQueue.getFirst())) {
+                dictQueue.addLast(text);
+                reply("Bạn muốn nó trả lời sao?");
+            } else {
+                dictQueue.clear();
+            }
         } else if (dictQueue.size() == 2) {
-            dictQueue.removeFirst();
-            val key = dictQueue.removeFirst();
-            teachDict.put(key, textOrig);
-            reply("Đã dạy xong!");
-            sync();
+            val profile = getProfile();
+            if (profile != null && profile.getDisplayName().equals(dictQueue.getFirst())) {
+                dictQueue.removeFirst();
+                val key = dictQueue.removeFirst();
+                teachDict.put(key, textOrig);
+                reply("Đã dạy xong!");
+                sync();
+            } else {
+                dictQueue.clear();
+            }
         } else {
             val match = teachDict.get(text);
             if (match != null && !match.isEmpty()) {
@@ -142,7 +195,8 @@ public class WebhookHandler {
         return HttpResponse.of(gson.toJson(teachDict));
     }
 
-    public HttpResponse setDict(final RequestContext context) throws FileNotFoundException {
+    public HttpResponse setDict(final RequestContext context)
+            throws FileNotFoundException, UnsupportedEncodingException {
         val body = context.getBody();
         val type = new TypeToken<HashMap<String, String>>() {}.getType();
         teachDict = gson.fromJson(body, type);
