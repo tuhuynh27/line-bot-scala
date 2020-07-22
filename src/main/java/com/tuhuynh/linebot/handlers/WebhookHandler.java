@@ -156,8 +156,9 @@ public class WebhookHandler {
 
         if (dictQueue.isEmpty() && ("dạy bot".equals(text) || "bot dạy".equals(text) || "dạy".equals(text))) {
             val profile = getProfile();
+            System.out.println(profile.getDisplayName());
             final List<String> admins = Arrays.asList("Tu Huynh (Tyler)", "Nga Le (Jade)", "Ninh",
-                                                      "Phuong Quach");
+                                                      "Phuong Quach", "Quynh");
             if (profile != null && admins.stream().anyMatch(s -> s.equals(profile.getDisplayName()))) {
                 dictQueue.addLast(profile.getDisplayName());
                 reply("Bạn muốn dạy cho từ gì?");
