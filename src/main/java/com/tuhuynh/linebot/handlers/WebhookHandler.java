@@ -32,7 +32,7 @@ public class WebhookHandler {
     private final LinkedList<String> dictQueue = new LinkedList<>();
     private HashMap<String, String> teachDict;
     private Event event;
-    private boolean trashtalkMode = false;
+    private boolean trashtalkMode;
 
     public WebhookHandler(final String token) throws IOException {
         this.token = token;
@@ -132,7 +132,7 @@ public class WebhookHandler {
         val text = event.getMessage().getText().trim().toLowerCase();
 
         if ("bot".equals(text)) {
-            reply("http://git.io/JJnc2");
+            reply("Hihi");
             return HttpResponse.of("OK");
         }
 
