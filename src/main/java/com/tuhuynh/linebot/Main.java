@@ -1,13 +1,12 @@
 package com.tuhuynh.linebot;
 
+import com.jinyframework.HttpServer;
+import com.jinyframework.core.RequestBinderBase.HttpResponse;
+import com.tuhuynh.linebot.handlers.WebhookHandler;
+import lombok.val;
+
 import java.io.IOException;
 import java.util.Map;
-
-import com.tuhuynh.httpserver.HttpServer;
-import com.tuhuynh.httpserver.core.RequestBinder.HttpResponse;
-import com.tuhuynh.linebot.handlers.WebhookHandler;
-
-import lombok.val;
 
 public final class Main {
     public static void main(String[] args) throws IOException {

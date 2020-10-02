@@ -1,12 +1,8 @@
 package com.tuhuynh.linebot.entities;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Builder
-@Getter
-@Setter
+@Data
 public class UserProfile {
     private String displayName;
     private String userId;

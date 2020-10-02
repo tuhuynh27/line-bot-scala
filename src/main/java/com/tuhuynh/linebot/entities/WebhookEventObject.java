@@ -1,12 +1,8 @@
 package com.tuhuynh.linebot.entities;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Builder
-@Setter
-@Getter
+@Data
 public class WebhookEventObject {
     private Event[] events;
     private String destination;

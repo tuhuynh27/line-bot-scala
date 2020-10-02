@@ -1,32 +1,26 @@
 package com.tuhuynh.linebot.handlers;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tuhuynh.httpserver.HttpClient;
-import com.tuhuynh.httpserver.core.RequestBinder.HttpResponse;
-import com.tuhuynh.httpserver.core.RequestBinder.RequestContext;
+import com.jinyframework.HttpClient;
+import com.jinyframework.core.RequestBinderBase.HttpResponse;
+import com.jinyframework.core.RequestBinderBase.RequestContext;
 import com.tuhuynh.linebot.entities.Event;
 import com.tuhuynh.linebot.entities.ReplyObject;
 import com.tuhuynh.linebot.entities.UserProfile;
 import com.tuhuynh.linebot.entities.WebhookEventObject;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 
-public class WebhookHandler {
+import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+public final class WebhookHandler {
     private final String token;
     private final Gson gson = new Gson();
     private final LinkedList<String> dictQueue = new LinkedList<>();
@@ -56,12 +50,12 @@ public class WebhookHandler {
     public UserProfile getProfile() throws Exception {
         val headers = new HashMap<String, String>();
         headers.put("Authorization",
-                    "Bearer " + token);
+                "Bearer " + token);
         val response = HttpClient.builder()
-                                 .method("GET")
-                                 .url("https://api.line.me/v2/bot/profile/" + event.getSource().getUserId())
-                                 .headers(headers)
-                                 .build().perform();
+                .method("GET")
+                .url("https://api.line.me/v2/bot/profile/" + event.getSource().getUserId())
+                .headers(headers)
+                .build().perform();
         if (response.getStatus() == 200) {
             return gson.fromJson(response.getBody(), UserProfile.class);
         }
@@ -74,19 +68,19 @@ public class WebhookHandler {
         val headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json");
         headers.put("Authorization",
-                    "Bearer " + token);
+                "Bearer " + token);
         val message = ReplyObject.Messages.builder()
-                                          .type("text")
-                                          .text(text).build();
+                .type("text")
+                .text(text).build();
         val replyObject = ReplyObject.builder().replyToken(event.getReplyToken()).messages(
-                new ReplyObject.Messages[] { message }).build();
+                new ReplyObject.Messages[]{message}).build();
         val replyObjectJson = gson.toJson(replyObject);
 
         HttpClient.builder()
-                  .method("POST").url("https://api.line.me/v2/bot/message/reply")
-                  .headers(headers)
-                  .body(replyObjectJson)
-                  .build().perform();
+                .method("POST").url("https://api.line.me/v2/bot/message/reply")
+                .headers(headers)
+                .body(replyObjectJson)
+                .build().perform();
     }
 
     public void sync() throws FileNotFoundException, UnsupportedEncodingException {
@@ -105,21 +99,15 @@ public class WebhookHandler {
             stringBuilder.append(line);
         }
         val str = stringBuilder.toString();
-        val type = new TypeToken<HashMap<String, String>>() {}.getType();
+        val type = new TypeToken<HashMap<String, String>>() {
+        }.getType();
         return gson.fromJson(str, type);
-    }
-
-    @Builder
-    @Getter
-    @Setter
-    private static class SimsimiResponse {
-        private String success;
     }
 
     public String getTrashTalk(final String msg) throws IOException {
         val result = HttpClient.builder()
-                               .method("GET").url("https://simsumi.herokuapp.com/api?text=" + msg.replace(" ", "+") + "&lang=vi")
-                               .build().perform();
+                .method("GET").url("https://simsumi.herokuapp.com/api?text=" + msg.replace(" ", "+") + "&lang=vi")
+                .build().perform();
         val body = result.getBody();
         val simsimiObj = gson.fromJson(body, SimsimiResponse.class);
         return simsimiObj.getSuccess();
@@ -158,8 +146,8 @@ public class WebhookHandler {
             val profile = getProfile();
             System.out.println(profile.getDisplayName());
             final List<String> admins = Arrays.asList("Tu Huynh (Tyler)", "Nga Le (Jade)", "Ninh",
-                                                      "Phuong Quach", "Quynh");
-            if (profile != null && admins.stream().anyMatch(s -> s.equals(profile.getDisplayName()))) {
+                    "Phuong Quach", "Quynh");
+            if (admins.stream().anyMatch(s -> s.equals(profile.getDisplayName()))) {
                 dictQueue.addLast(profile.getDisplayName());
                 reply("Bạn muốn dạy cho từ gì?");
             }
@@ -199,9 +187,17 @@ public class WebhookHandler {
     public HttpResponse setDict(final RequestContext context)
             throws FileNotFoundException, UnsupportedEncodingException {
         val body = context.getBody();
-        val type = new TypeToken<HashMap<String, String>>() {}.getType();
+        val type = new TypeToken<HashMap<String, String>>() {
+        }.getType();
         teachDict = gson.fromJson(body, type);
         sync();
         return HttpResponse.of("Done");
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    private static class SimsimiResponse {
+        private String success;
     }
 }

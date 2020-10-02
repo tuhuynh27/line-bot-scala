@@ -4,7 +4,7 @@
 
 Simple LINE Bot, for LINE VN HR
 
-Written with [com.tuhuynh.httpserver](https://github.com/huynhminhtufu/httpserver)
+Written with [com.jinyframework](https://github.com/huynhminhtufu/jiny)
 
 ## Run
 
@@ -19,8 +19,3 @@ Written with [com.tuhuynh.httpserver](https://github.com/huynhminhtufu/httpserve
 ./gradle build
 PORT=1234 TOKEN=YOUR_LINE_TOKEN java -jar ./build/libs/linebot-1.0-SNAPSHOT-fat.jar
 ```
-
-Cost:
-
-- Jar: 308KB
-- Init: 20MB MEM
