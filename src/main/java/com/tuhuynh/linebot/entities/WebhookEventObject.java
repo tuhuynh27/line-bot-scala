@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class WebhookEventObject {
-    private Event[] events;
-    private String destination;
+    Event[] events;
+    String destination;
 }

@@ -6,13 +6,13 @@ import lombok.Data;
 @Data
 @Builder
 public class ReplyObject {
-    private String replyToken;
-    private Messages[] messages;
+    String replyToken;
+    Messages[] messages;
 
     @Data
     @Builder
     public static class Messages {
-        private String type;
-        private String text;
+        String type;
+        String text;
     }
 }

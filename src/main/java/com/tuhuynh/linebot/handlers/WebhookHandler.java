@@ -12,6 +12,7 @@ import com.tuhuynh.linebot.entities.WebhookEventObject;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.*;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+@Slf4j
 public final class WebhookHandler {
     private final String token;
     private final Gson gson = new Gson();
@@ -64,7 +66,7 @@ public final class WebhookHandler {
     }
 
     public void reply(final String text) throws IOException {
-        System.out.println(text);
+        log.info(text);
         val headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json");
         headers.put("Authorization",
@@ -88,7 +90,7 @@ public final class WebhookHandler {
         out.print(gson.toJson(teachDict));
         out.flush();
         out.close();
-        System.out.println("Synced");
+        log.info("Synced");
     }
 
     public HashMap<String, String> read() throws IOException {

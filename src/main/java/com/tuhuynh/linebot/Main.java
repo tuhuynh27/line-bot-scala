@@ -15,7 +15,7 @@ public final class Main {
         final Map<String, String> env = System.getenv();
         final String token = env.get("TOKEN");
         if (token == null) {
-            System.out.println("Missing token env");
+            log.error("Missing token env");
             System.exit(1);
         }
         final String port = env.get("PORT") == null ? "1234" : env.get("PORT");
@@ -32,19 +32,14 @@ public final class Main {
         log.info("Added shutdown hook");
 
         val webhookHandler = new WebhookHandler(token);
+        server.get("/", ctx -> HttpResponse.of("Hello World!"));
         server.post("/webhook", webhookHandler::handleWebhook);
         server.get("/dict", webhookHandler::showDict);
         server.post("/dict", ctx -> {
-            final String authorization = ctx.getHeader().get("authorization");
-            System.out.println(authorization);
-            if (authorization == null) {
-                return HttpResponse.reject("Unauthorized").status(401);
-            }
-
-            if ("Bearer LINEVN Tu Huynh".equals(authorization)) {
+            val authorization = ctx.headerParam("authorization");
+            if ("Bearer tu.huynh@linecorp.com".equals(authorization)) {
                 return HttpResponse.next();
             }
-
             return HttpResponse.reject("Unauthorized").status(401);
         }, webhookHandler::setDict);
         server.start();

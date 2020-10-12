@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class Event {
-    private String type;
-    private String replyToken;
-    private Source source;
-    private long timestamp;
-    private String mode;
-    private Message message;
+    String type;
+    String replyToken;
+    Source source;
+    long timestamp;
+    String mode;
+    Message message;
 }
