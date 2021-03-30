@@ -16,6 +16,6 @@ Written with [com.jinyframework](https://github.com/huynhminhtufu/jiny)
 ## Build
 
 ```bash
-./gradle build
+./gradlew build
 PORT=1234 TOKEN=YOUR_LINE_TOKEN java -jar ./build/libs/linebot-1.0-SNAPSHOT-fat.jar
 ```

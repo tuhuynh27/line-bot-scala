@@ -1,7 +1,6 @@
 package com.tuhuynh.linebot;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.TreeMap;
 
 import com.jinyframework.HttpServer;
@@ -14,13 +13,13 @@ import lombok.val;
 @Slf4j
 public final class Main {
     public static void main(String[] args) throws IOException {
-        final Map<String, String> env = System.getenv();
-        final String token = env.get("TOKEN");
+        val env = System.getenv();
+        val token = env.get("TOKEN");
         if (token == null) {
             log.error("Missing token env");
             System.exit(1);
         }
-        final String port = env.get("PORT") == null ? "1234" : env.get("PORT");
+        val port = env.get("PORT") == null ? "1234" : env.get("PORT");
 
         val server = HttpServer.port(Integer.parseInt(port));
         val responseHeaders = new TreeMap<String, String>();
