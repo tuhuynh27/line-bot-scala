@@ -1,5 +1,15 @@
 package com.tuhuynh.linebot.handlers;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jinyframework.HttpClient;
@@ -9,17 +19,13 @@ import com.tuhuynh.linebot.entities.Event;
 import com.tuhuynh.linebot.entities.ReplyObject;
 import com.tuhuynh.linebot.entities.UserProfile;
 import com.tuhuynh.linebot.entities.WebhookEventObject;
+
 import lombok.Builder;
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-
-import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 @Slf4j
 public final class WebhookHandler {
@@ -52,12 +58,12 @@ public final class WebhookHandler {
     public UserProfile getProfile() throws Exception {
         val headers = new HashMap<String, String>();
         headers.put("Authorization",
-                "Bearer " + token);
+                    "Bearer " + token);
         val response = HttpClient.builder()
-                .method("GET")
-                .url("https://api.line.me/v2/bot/profile/" + event.getSource().getUserId())
-                .headers(headers)
-                .build().perform();
+                                 .method("GET")
+                                 .url("https://api.line.me/v2/bot/profile/" + event.getSource().getUserId())
+                                 .headers(headers)
+                                 .build().perform();
         if (response.getStatus() == 200) {
             return gson.fromJson(response.getBody(), UserProfile.class);
         }
@@ -70,26 +76,26 @@ public final class WebhookHandler {
         val headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json");
         headers.put("Authorization",
-                "Bearer " + token);
+                    "Bearer " + token);
         val message = ReplyObject.Messages.builder()
-                .type("text")
-                .text(text).build();
+                                          .type("text")
+                                          .text(text).build();
         val replyObject = ReplyObject.builder().replyToken(event.getReplyToken()).messages(
-                new ReplyObject.Messages[]{message}).build();
+                new ReplyObject.Messages[] { message }).build();
         val replyObjectJson = gson.toJson(replyObject);
 
         HttpClient.builder()
-                .method("POST").url("https://api.line.me/v2/bot/message/reply")
-                .headers(headers)
-                .body(replyObjectJson)
-                .build().perform();
+                  .method("POST").url("https://api.line.me/v2/bot/message/reply")
+                  .headers(headers)
+                  .body(replyObjectJson)
+                  .build().perform();
     }
 
     public void sync() throws FileNotFoundException {
+        @Cleanup
         val out = new PrintWriter("data.json");
         out.print(gson.toJson(teachDict));
         out.flush();
-        out.close();
         log.info("Synced");
     }
 
@@ -108,8 +114,9 @@ public final class WebhookHandler {
 
     public String getTrashTalk(final String msg) throws IOException {
         val result = HttpClient.builder()
-                .method("GET").url("https://simsumi.herokuapp.com/api?text=" + msg.replace(" ", "+") + "&lang=vi")
-                .build().perform();
+                               .method("GET").url(
+                        "https://simsumi.herokuapp.com/api?text=" + msg.replace(" ", "+") + "&lang=vi")
+                               .build().perform();
         val body = result.getBody();
         val simsimiObj = gson.fromJson(body, SimsimiResponse.class);
         return simsimiObj.getSuccess();
@@ -148,7 +155,7 @@ public final class WebhookHandler {
             val profile = getProfile();
             System.out.println(profile.getDisplayName());
             final List<String> admins = Arrays.asList("Tu Huynh (Tyler)", "Nga Le (Jade)", "Ninh",
-                    "Phuong Quach", "Quynh");
+                                                      "Phuong Quach", "Quynh");
             if (admins.stream().anyMatch(s -> s.equals(profile.getDisplayName()))) {
                 dictQueue.addLast(profile.getDisplayName());
                 reply("Bạn muốn dạy cho từ gì?");
