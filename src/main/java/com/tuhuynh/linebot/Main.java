@@ -1,13 +1,15 @@
 package com.tuhuynh.linebot;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.jinyframework.HttpServer;
 import com.jinyframework.core.AbstractRequestBinder.HttpResponse;
 import com.tuhuynh.linebot.handlers.WebhookHandler;
+
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-
-import java.io.IOException;
-import java.util.Map;
 
 @Slf4j
 public final class Main {
@@ -21,6 +23,9 @@ public final class Main {
         final String port = env.get("PORT") == null ? "1234" : env.get("PORT");
 
         val server = HttpServer.port(Integer.parseInt(port));
+        val responseHeaders = new TreeMap<String, String>();
+        responseHeaders.put("content-type", "application/json; charset=utf-8");
+        server.useResponseHeaders(responseHeaders);
 
         Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
         log.info("Added shutdown hook");
