@@ -3,8 +3,8 @@ package com.tuhuynh.linebot.handlers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.jinyframework.HttpClient;
-import com.jinyframework.core.RequestBinderBase.HttpResponse;
-import com.jinyframework.core.RequestBinderBase.RequestContext;
+import com.jinyframework.core.AbstractRequestBinder.Context;
+import com.jinyframework.core.AbstractRequestBinder.HttpResponse;
 import com.tuhuynh.linebot.entities.Event;
 import com.tuhuynh.linebot.entities.ReplyObject;
 import com.tuhuynh.linebot.entities.UserProfile;
@@ -85,7 +85,7 @@ public final class WebhookHandler {
                 .build().perform();
     }
 
-    public void sync() throws FileNotFoundException, UnsupportedEncodingException {
+    public void sync() throws FileNotFoundException {
         val out = new PrintWriter("data.json");
         out.print(gson.toJson(teachDict));
         out.flush();
@@ -115,7 +115,7 @@ public final class WebhookHandler {
         return simsimiObj.getSuccess();
     }
 
-    public HttpResponse handleWebhook(final RequestContext ctx) throws Exception {
+    public HttpResponse handleWebhook(final Context ctx) throws Exception {
         getWebHookEventObject(ctx.getBody());
 
         val textOrig = event.getMessage().getText().trim();
@@ -182,11 +182,11 @@ public final class WebhookHandler {
         return HttpResponse.of("OK");
     }
 
-    public HttpResponse showDict(final RequestContext context) {
+    public HttpResponse showDict(final Context context) {
         return HttpResponse.of(gson.toJson(teachDict));
     }
 
-    public HttpResponse setDict(final RequestContext context)
+    public HttpResponse setDict(final Context context)
             throws FileNotFoundException, UnsupportedEncodingException {
         val body = context.getBody();
         val type = new TypeToken<HashMap<String, String>>() {

@@ -1,7 +1,7 @@
 package com.tuhuynh.linebot;
 
 import com.jinyframework.HttpServer;
-import com.jinyframework.core.RequestBinderBase.HttpResponse;
+import com.jinyframework.core.AbstractRequestBinder.HttpResponse;
 import com.tuhuynh.linebot.handlers.WebhookHandler;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -22,13 +22,7 @@ public final class Main {
 
         val server = HttpServer.port(Integer.parseInt(port));
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                server.stop();
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
         log.info("Added shutdown hook");
 
         val webhookHandler = new WebhookHandler(token);
