@@ -187,7 +187,7 @@ public final class WebhookHandler {
     }
 
     public HttpResponse setDict(final Context context)
-            throws FileNotFoundException, UnsupportedEncodingException {
+            throws FileNotFoundException {
         val body = context.getBody();
         val type = new TypeToken<HashMap<String, String>>() {
         }.getType();

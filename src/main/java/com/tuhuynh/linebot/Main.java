@@ -31,7 +31,8 @@ public final class Main {
         server.get("/dict", webhookHandler::showDict);
         server.post("/dict", ctx -> {
             val authorization = ctx.headerParam("authorization");
-            if ("Bearer tu.huynh@linecorp.com".equals(authorization)) {
+            val bearerToken = "Bearer " + token;
+            if (bearerToken.equals(authorization)) {
                 return HttpResponse.next();
             }
             return HttpResponse.reject("Unauthorized").status(401);
