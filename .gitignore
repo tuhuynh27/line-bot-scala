@@ -5,6 +5,4 @@ build/
 gradle.properties
 DictData
 DictDataIndex
-FeedbackData
-FeedbackDataIndex
 .env

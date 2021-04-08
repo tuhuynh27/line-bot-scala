@@ -1,9 +1,9 @@
-package com.tuhuynh.linebotscala.service.simsimi
+package com.tuhuynh.linebot.service.simsimi
 
 import com.jinyframework.HttpClient
-import com.tuhuynh.linebotscala.factory.AppContext
-import com.tuhuynh.linebotscala.service.logging.LoggingService
-import com.tuhuynh.linebotscala.service.simsimi.entity.SimsimiResponse
+import com.tuhuynh.linebot.factory.AppContext
+import com.tuhuynh.linebot.service.logging.LoggingService
+import com.tuhuynh.linebot.service.simsimi.entity.SimsimiResponse
 
 object SimsimiService {
   def getTrashtalk(msg: String): String = {

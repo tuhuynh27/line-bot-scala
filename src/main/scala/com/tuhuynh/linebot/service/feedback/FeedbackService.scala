@@ -1,13 +1,11 @@
-package com.tuhuynh.linebotscala.service.feedback
-
-import com.tuhuynh.linebotscala.factory.AppContext
+package com.tuhuynh.linebot.service.feedback
 
 import java.io.FileWriter
 import java.util.Calendar
 import scala.collection.mutable
 
 object FeedbackService {
-  private val store = AppContext.feedbackStore
+  private val store: mutable.Map[String, Short] = mutable.HashMap()
   private val tempt: mutable.Map[String, String] = mutable.HashMap()
 
   def openSession(userId: String): Unit = {
@@ -16,7 +14,7 @@ object FeedbackService {
   }
 
   private def put(key: String, value: Short): Unit = this.synchronized {
-    store.putShort(key, value)
+    store.put(key, value)
   }
 
   def closeSession(userId: String): Unit = {
@@ -38,12 +36,16 @@ object FeedbackService {
   }
 
   def isSessionOpening(userId: String): Boolean = {
-    val got = get(userId)
-    if (got == 1) true else false
+    try {
+      val got = get(userId)
+      if (got == 1) true else false
+    } catch {
+      case _: Exception => return false
+    }
   }
 
   private def get(key: String): Short = this.synchronized {
-    store.getShort(key)
+    store(key)
   }
 
   def pushFeedback(userId: String, content: String): Unit = {

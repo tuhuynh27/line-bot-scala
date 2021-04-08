@@ -1,6 +1,6 @@
-package com.tuhuynh.linebotscala.service.dict
+package com.tuhuynh.linebot.service.dict
 
-import com.tuhuynh.linebotscala.factory.AppContext
+import com.tuhuynh.linebot.factory.AppContext
 
 object DictService {
   private val store = AppContext.dictStore

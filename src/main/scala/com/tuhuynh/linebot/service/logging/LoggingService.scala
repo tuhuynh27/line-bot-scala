@@ -1,6 +1,6 @@
-package com.tuhuynh.linebotscala.service.logging
+package com.tuhuynh.linebot.service.logging
 
-import com.tuhuynh.linebotscala.entity.Event
+import com.tuhuynh.linebot.entity.Event
 import org.slf4j.LoggerFactory
 
 object LoggingService {

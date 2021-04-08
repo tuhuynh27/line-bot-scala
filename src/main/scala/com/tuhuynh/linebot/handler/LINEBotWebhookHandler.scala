@@ -1,9 +1,9 @@
-package com.tuhuynh.linebotscala.handler
+package com.tuhuynh.linebot.handler
 
 import com.jinyframework.HttpClient
-import com.tuhuynh.linebotscala.entity._
-import com.tuhuynh.linebotscala.factory.AppContext
-import com.tuhuynh.linebotscala.service.logging.LoggingService
+import com.tuhuynh.linebot.entity._
+import com.tuhuynh.linebot.factory.AppContext
+import com.tuhuynh.linebot.service.logging.LoggingService
 
 import java.util
 

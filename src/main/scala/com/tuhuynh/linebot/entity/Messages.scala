@@ -1,3 +1,3 @@
-package com.tuhuynh.linebotscala.entity
+package com.tuhuynh.linebot.entity
 
 case class Messages(`type`: String, text: String)

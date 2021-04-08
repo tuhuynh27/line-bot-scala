@@ -1,18 +1,19 @@
-package com.tuhuynh.linebotscala
+package com.tuhuynh.linebot
 
 import com.jinyframework.HttpServer
 import com.jinyframework.core.AbstractRequestBinder.HttpResponse._
 import com.jinyframework.core.utils.ParserUtils.HttpMethod
-import com.tuhuynh.linebotscala.entity.JSONResponse
-import com.tuhuynh.linebotscala.factory.AppContext
-import com.tuhuynh.linebotscala.handler.WebhookHandler
+import com.tuhuynh.linebot.entity.JSONResponse
+import com.tuhuynh.linebot.factory.AppContext
+import com.tuhuynh.linebot.handler.WebhookHandler
 
 import java.util
 
 object Main extends App {
-  val server = HttpServer.port(1234)
   val env = System.getenv()
   val token = env.get("TOKEN")
+  val port = env.get("PORT")
+  val server = HttpServer.port(Integer.parseInt(port))
   val respHeaders = new util.TreeMap[String, String]()
   if (token == null) {
     log("Missing token env")

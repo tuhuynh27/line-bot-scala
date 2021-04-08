@@ -1,12 +1,12 @@
-package com.tuhuynh.linebotscala.handler
+package com.tuhuynh.linebot.handler
 
 import com.jinyframework.core.AbstractRequestBinder.HttpResponse._
 import com.jinyframework.core.AbstractRequestBinder.{Context, HttpResponse}
-import com.tuhuynh.linebotscala.entity.JSONResponse
-import com.tuhuynh.linebotscala.service.dict.DictService
-import com.tuhuynh.linebotscala.service.feedback.FeedbackService
-import com.tuhuynh.linebotscala.service.logging.LoggingService
-import com.tuhuynh.linebotscala.service.simsimi.SimsimiService
+import com.tuhuynh.linebot.entity.JSONResponse
+import com.tuhuynh.linebot.service.dict.DictService
+import com.tuhuynh.linebot.service.feedback.FeedbackService
+import com.tuhuynh.linebot.service.logging.LoggingService
+import com.tuhuynh.linebot.service.simsimi.SimsimiService
 
 import java.util
 
