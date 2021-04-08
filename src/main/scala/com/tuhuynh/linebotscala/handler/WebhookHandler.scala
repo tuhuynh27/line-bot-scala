@@ -4,15 +4,15 @@ import com.jinyframework.core.AbstractRequestBinder.HttpResponse._
 import com.jinyframework.core.AbstractRequestBinder.{Context, HttpResponse}
 import com.tuhuynh.linebotscala.entity.JSONResponse
 import com.tuhuynh.linebotscala.service.dict.DictService
-import com.tuhuynh.linebotscala.service.feedback.FeedBackService
+import com.tuhuynh.linebotscala.service.feedback.FeedbackService
 import com.tuhuynh.linebotscala.service.logging.LoggingService
 import com.tuhuynh.linebotscala.service.simsimi.SimsimiService
 
 import java.util
 
 class WebhookHandler(val token: String) extends LINEBotWebhookHandler(token) {
-  private var trashtalkMode = false
   private val dictQueue = new util.LinkedList[String]
+  private var trashtalkMode = false
 
   def handleWebhook(context: Context): HttpResponse = {
     initEvent(context.getBody)
@@ -28,17 +28,17 @@ class WebhookHandler(val token: String) extends LINEBotWebhookHandler(token) {
     // Feedback Service
     if (event.get.source.`type` == "user") {
       val userId = getProfile.userId
-      if (FeedBackService.isSessionOpening(userId)) {
+      if (FeedbackService.isSessionOpening(userId)) {
         if (text == "end feedback") {
-          FeedBackService.closeSession(userId)
+          FeedbackService.closeSession(userId)
           reply("Cảm ơn bạn!")
           return of(JSONResponse("OK"))
         }
         // Record feedback
-        FeedBackService.pushFeedback(userId, text)
+        FeedbackService.pushFeedback(userId, text)
       } else {
         if (text == "feedback") {
-          FeedBackService.openSession(userId)
+          FeedbackService.openSession(userId)
           reply("Xin chào bạn, mời bạn feedback cho HR team")
           return of(JSONResponse("OK"))
         }

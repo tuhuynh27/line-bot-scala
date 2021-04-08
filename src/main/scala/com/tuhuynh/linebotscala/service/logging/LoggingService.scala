@@ -4,7 +4,6 @@ import com.tuhuynh.linebotscala.entity.Event
 import org.slf4j.LoggerFactory
 
 object LoggingService {
-  case class LINEBotLogging()
   private val logger = LoggerFactory.getLogger(classOf[LINEBotLogging])
 
   def log(event: Event): Unit = {
@@ -21,4 +20,6 @@ object LoggingService {
   def error(exception: Exception): Unit = {
     logger.error(exception.getMessage, exception)
   }
+
+  case class LINEBotLogging()
 }

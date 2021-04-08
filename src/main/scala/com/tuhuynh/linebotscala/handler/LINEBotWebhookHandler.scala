@@ -1,7 +1,7 @@
 package com.tuhuynh.linebotscala.handler
 
 import com.jinyframework.HttpClient
-import com.tuhuynh.linebotscala.entity.{Event, Messages, ReplyObject, UserProfile, WebhookEventObject}
+import com.tuhuynh.linebotscala.entity._
 import com.tuhuynh.linebotscala.factory.AppContext
 import com.tuhuynh.linebotscala.service.logging.LoggingService
 
