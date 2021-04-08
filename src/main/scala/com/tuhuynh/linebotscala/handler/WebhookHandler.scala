@@ -2,82 +2,97 @@ package com.tuhuynh.linebotscala.handler
 
 import com.jinyframework.core.AbstractRequestBinder.HttpResponse._
 import com.jinyframework.core.AbstractRequestBinder.{Context, HttpResponse}
-import com.tuhuynh.linebotscala.factory.AppContext
+import com.tuhuynh.linebotscala.entity.JSONResponse
 import com.tuhuynh.linebotscala.service.dict.DictService
+import com.tuhuynh.linebotscala.service.feedback.FeedBackService
 import com.tuhuynh.linebotscala.service.logging.LoggingService
 import com.tuhuynh.linebotscala.service.simsimi.SimsimiService
 
 import java.util
 
-class WebhookHandler(val token: String) extends AbstractWebhookHandler {
+class WebhookHandler(val token: String) extends LINEBotWebhookHandler(token) {
   private var trashtalkMode = false
   private val dictQueue = new util.LinkedList[String]
 
   def handleWebhook(context: Context): HttpResponse = {
-    val event = getWebHookEventObject(context.getBody)
-    LoggingService.log(event)
+    initEvent(context.getBody)
 
-    val textOrig = event.message.text.trim
+    val textOrig = event.get.message.text.trim
     val text = textOrig.toLowerCase
 
     if (text == "bot") {
-      reply(event, token, "Hihi")
-      return of("OK")
+      reply("Hihi")
+      return of(JSONResponse("OK"))
+    }
+
+    // Feedback Service
+    if (event.get.source.`type` == "user") {
+      val userId = getProfile.userId
+      if (FeedBackService.isSessionOpening(userId)) {
+        if (text == "end feedback") {
+          FeedBackService.closeSession(userId)
+          reply("Cảm ơn bạn!")
+          return of(JSONResponse("OK"))
+        }
+        // Record feedback
+        FeedBackService.pushFeedback(userId, text)
+      } else {
+        if (text == "feedback") {
+          FeedBackService.openSession(userId)
+          reply("Xin chào bạn, mời bạn feedback cho HR team")
+          return of(JSONResponse("OK"))
+        }
+      }
     }
 
     if (!trashtalkMode && text == "trash") {
       trashtalkMode = true
-      LoggingService.log("trashtalkMode = true")
-      reply(event, token, "OK!")
-      return of ("OK")
+      LoggingService.info("trashtalkMode = true")
+      reply("OK!")
+      return of(JSONResponse("OK"))
     }
-
     if (trashtalkMode) {
       if (text == "stop trash") {
         trashtalkMode = false
-        LoggingService.log("trashtalkMode = false")
-        reply(event, token, "Đã dừng trashtalk ạ!")
-        return of("OK")
+        LoggingService.info("trashtalkMode = false")
+        reply("Đã dừng trashtalk ạ!")
+        return of(JSONResponse("OK"))
       }
 
       val trashtalkText = SimsimiService.getTrashtalk(text)
-      reply(event, token, trashtalkText)
-      return of("OK")
+      reply(trashtalkText)
+      return of(JSONResponse("OK"))
     }
 
     if (dictQueue.isEmpty && text == "dạy bot") {
-      val profile = getProfile(event, token)
+      val profile = getProfile
       dictQueue.addLast(profile.displayName)
-      reply(event, token, "Bạn muốn dạy cho từ gì?")
+      reply("Bạn muốn dạy cho từ gì?")
     } else if (dictQueue.size == 1) {
-      val profile = getProfile(event, token)
+      val profile = getProfile
       if (profile.displayName == dictQueue.getFirst) {
         dictQueue.addLast(text)
-        reply(event, token, "Bạn muốn nó trả lời sao?")
+        reply("Bạn muốn nó trả lời sao?")
       } else {
         dictQueue.clear()
       }
     } else if (dictQueue.size == 2) {
-      val profile = getProfile(event, token)
+      val profile = getProfile
       if (profile.displayName == dictQueue.getFirst) {
         dictQueue.removeFirst()
         val key = dictQueue.removeFirst()
         DictService.put(key, textOrig)
-        reply(event, token, "Đã dạy xong!")
+        reply("Đã dạy xong!")
       } else {
         dictQueue.clear()
       }
     } else {
       val matched = DictService.get(text)
-      if (matched.isDefined) {
-        reply(event, token, matched.get)
+      if (matched != null && matched.nonEmpty) {
+        reply(matched)
       }
     }
 
-    of("OK")
-  }
-
-  def showDict(context: Context): HttpResponse = {
-    of(AppContext.getGson.toJson(DictService.all()))
+    of(JSONResponse("OK"))
   }
 }

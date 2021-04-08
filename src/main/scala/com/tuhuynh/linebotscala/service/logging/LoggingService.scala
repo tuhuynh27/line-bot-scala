@@ -14,7 +14,11 @@ object LoggingService {
     logger.info("Event Message Text: " + event.message.text)
   }
 
-  def log(text: String): Unit = {
-    logger.info(text)
+  def info(obj: Object): Unit = {
+    logger.info(obj.toString)
+  }
+
+  def error(exception: Exception): Unit = {
+    logger.error(exception.getMessage, exception)
   }
 }

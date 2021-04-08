@@ -3,4 +3,7 @@ build/
 .gradle/
 .DS_Store
 gradle.properties
-data.json
+DictData
+DictDataIndex
+FeedbackData
+FeedbackDataIndex

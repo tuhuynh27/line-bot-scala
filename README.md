@@ -4,7 +4,7 @@
 
 Simple LINE Bot, for LINE VN HR
 
-Written with [com.jinyframework](https://github.com/huynhminhtufu/jiny)
+Written with [com.jinyframework](https://github.com/huynhminhtufu/jiny) and [keva-DB](https://github.com/tuhuynh27/jiny/tree/master/keva)
 
 ## Run
 
